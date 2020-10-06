@@ -1,12 +1,22 @@
-import express from 'express'
+import express, { Request, Response, NextFunction } from 'express'
 import bodyParser from 'body-parser'
+import cookieSession from 'cookie-session'
 import router from './router'
 const app = express()
 
-// 问题一:express库的类型定义文件.d.ts 文件类型描述不准确
-// 问题二:使用中间件时候,对req,res修改后,实际上类型并不能改变
-
 app.use(bodyParser.urlencoded({ extended: false }))//处理表单
+// 自定义中间件
+// app.use((req: Request, res: Response, next: NextFunction) => {
+//     req.teacherName = 'dell'
+//     next()
+// })
+app.use(
+    cookieSession({
+        name: 'session',
+        keys: ['gao'],
+        maxAge: 24 * 60 * 60 * 1000
+    })
+)
 app.use(router)
 
 app.listen(7001, () => {
