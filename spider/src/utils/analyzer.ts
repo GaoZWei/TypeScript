@@ -1,6 +1,6 @@
 import fs from 'fs';
 import cheerio from 'cheerio';
-import { Analyzer } from './crowller2';
+import { Analyzer } from '../crowller2';
 //单例模式
 interface Course {
   title: string;
