@@ -1,25 +1,28 @@
-// 真正的装饰器
-function testDecorator() {
-    //constructor是泛型,可以实例化,创建出类,应该有以下构造函数
-    return function <T extends new (...args: any[]) => any>(constructor: T) {
-        return class extends constructor {
-            name = 'gzw'
-            getName() {
-                return this.name
+const userInfo: any = undefined
+
+function catchError(msg: string) {//工厂模式
+    return function (target: any, key: string, descriptor: PropertyDescriptor) {
+        const fn = descriptor.value
+        descriptor.value = function () {
+            try {
+                fn()
+            } catch (e) {
+                console.log(msg);
             }
         }
     }
 }
 
-const Test = testDecorator()(//工厂函数
-    class {
-        name: string;
-        constructor(name: string) {
-            this.name = name
-        }
+class Test1 {
+    @catchError('userInfo.name 不存在')
+    getName() {
+        return userInfo.name
     }
-);
-
-const test = new Test('gao')
-console.log(test.getName())
-
+    @catchError('userInfo.age 不存在')
+    getAge() {
+        return userInfo.age
+    }
+}
+const test1 = new Test1()
+test1.getName()
+test1.getAge()
