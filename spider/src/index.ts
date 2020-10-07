@@ -2,9 +2,12 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import cookieSession from 'cookie-session'
-import router from './router'
-const app = express()
+import './controller/LoginController'
+import './controller/CrowllerController'
+import { router } from './controller/decorator'
+// import router from './router'
 
+const app = express()
 app.use(bodyParser.urlencoded({ extended: false }))//处理表单
 // 自定义中间件
 // app.use((req: Request, res: Response, next: NextFunction) => {
