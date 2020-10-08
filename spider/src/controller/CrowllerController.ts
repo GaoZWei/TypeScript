@@ -2,7 +2,7 @@ import 'reflect-metadata'
 import fs from 'fs'
 import path from 'path'
 import { Request, Response, NextFunction } from 'express'
-import { controller, get, use } from './decorator'
+import { controller, use, get } from '../decorator'
 import { getResponseData } from '../utils/util'
 import Crowller from '../utils/crowller'
 import Analyzer from '../utils/analyzer';
@@ -12,8 +12,9 @@ interface BodyRequest extends Request {
     }
 }
 
-const checkLogin = (req: Request, res: Response, next: NextFunction) => {
-    const isLogin = req.session ? req.session.login : false
+const checkLogin = (req: Request, res: Response, next: NextFunction): void => {
+    console.log('checkLogin middleware');
+    const isLogin = !!(req.session ? req.session.login : false)  //!!转成bool类型
     if (isLogin) {
         next()
     } else {
@@ -21,12 +22,18 @@ const checkLogin = (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-@controller
-class CrowllerController {
+const test = (req: Request, res: Response, next: NextFunction): void => {
+   console.log('test middleware');
+   next()
+}
+
+@controller('/')
+export class CrowllerController {
 
     @get('/getData')
     @use(checkLogin)//把中间件注册到函数中
-    getData(req: BodyRequest, res: Response) {
+    @use(test)
+    getData(req: BodyRequest, res: Response): void {
         const secret = 'secretKey';
         const url = `http://www.dell-lee.com/typescript/demo.html?secret=${secret}`;
         const analyzer = Analyzer.getInstance();
@@ -36,7 +43,7 @@ class CrowllerController {
 
     @get('/showData')
     @use(checkLogin)//把中间件注册到函数中
-    showData(req: BodyRequest, res: Response) {
+    showData(req: BodyRequest, res: Response): void {
         try {
             const position = path.resolve(__dirname, "../../data/course.json")
             const result = fs.readFileSync(position, 'utf-8')

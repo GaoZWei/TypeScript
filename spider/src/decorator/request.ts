@@ -1,9 +1,7 @@
-//全部被抽离了,优化结构了
-
-import { Router, RequestHandler } from 'express'
-// export const router = Router()//装饰器走完,就会生成router的路由,走对应的路由
-import router from "../router"
-enum Methods {
+// import { Router, RequestHandler } from 'express'
+// // export const router = Router()//装饰器走完,就会生成router的路由,走对应的路由
+import { CrowllerController, LoginController } from "../controller"
+export enum Methods {
     get = "get",
     post = "post"
 }
@@ -11,7 +9,7 @@ enum Methods {
 // 工厂函数解决不同请求的方法
 function getRequestDecorator(type: Methods) {
     return function (path: string) {
-        return function (target: any, key: string) {
+        return function (target: CrowllerController | LoginController, key: string) {
             Reflect.defineMetadata('path', path, target, key)//自定义
             Reflect.defineMetadata('method', type, target, key)
         }
