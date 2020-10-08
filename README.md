@@ -3,6 +3,7 @@ TypeScript+React
 
 目录结构:
 advance/enum 枚举类型
+app_with_ts  react项目用ts实现
 advance/genetic 泛型
 advance/src  tsconfig测试+类型保护
 
@@ -14,3 +15,7 @@ model_demo 模块化
 namespace 命名空间
 parcel_demo parcel示例+类型定义文件
 spider/src/crowller 最终版本代码+结合express实现
+
+
+前端为app_with_ts
+后端为spider

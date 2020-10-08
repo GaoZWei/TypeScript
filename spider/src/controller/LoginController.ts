@@ -16,6 +16,12 @@ export class LoginController {
         return !!(req.session ? req.session.login : false)
     }
 
+    @get('/api/isLogin')  //适配前端的跨域代理接口
+    isLogin(req: BodyRequest, res: Response): void {
+        const isLogin = LoginController.isLogin(req)
+        res.json(getResponseData(isLogin))
+    }
+
     @post('/login')
     login(req: BodyRequest, res: Response): void {
         const { password } = req.body
