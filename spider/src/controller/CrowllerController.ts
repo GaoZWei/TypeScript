@@ -6,11 +6,20 @@ import { controller, use, get } from '../decorator'
 import { getResponseData } from '../utils/util'
 import Crowller from '../utils/crowller'
 import Analyzer from '../utils/analyzer';
+
 interface BodyRequest extends Request {
     body: {
         [key: string]: string | undefined//KEY设置为任何形式的stirng
     }
 }
+
+// interface CourseItem {
+//     title: string;
+//     count: number;
+// }
+// interface DataStructure {
+//     [key: string]: CourseItem[]
+// }
 
 const checkLogin = (req: Request, res: Response, next: NextFunction): void => {
     // console.log('checkLogin middleware');
@@ -24,8 +33,8 @@ const checkLogin = (req: Request, res: Response, next: NextFunction): void => {
 
 //测试小功能(可忽略)
 const test = (req: Request, res: Response, next: NextFunction): void => {
-   console.log('test middleware');
-   next()
+    console.log('test middleware');
+    next()
 }
 
 @controller('/api')
@@ -39,7 +48,7 @@ export class CrowllerController {
         const url = `http://www.dell-lee.com/typescript/demo.html?secret=${secret}`;
         const analyzer = Analyzer.getInstance();
         new Crowller(url, analyzer);
-        res.json(getResponseData(true))
+        res.json(getResponseData<responseResult.getData>(true))
     }
 
     @get('/showData')
@@ -48,9 +57,9 @@ export class CrowllerController {
         try {
             const position = path.resolve(__dirname, "../../data/course.json")
             const result = fs.readFileSync(position, 'utf-8')
-            res.json(getResponseData(JSON.parse(result)))
+            res.json(getResponseData<responseResult.showData>(JSON.parse(result)))
         } catch (e) {
-            res.json(getResponseData(false, '数据不存在'))
+            res.json(getResponseData<responseResult.showData>(false, '数据不存在'))
         }
     }
 }

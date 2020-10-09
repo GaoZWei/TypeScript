@@ -2,26 +2,30 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Button, message } from 'antd'
 import ReactEcharts from 'echarts-for-react';
-import axios from 'axios'
+import request from '../../request'
 import moment from 'moment'
 import './style.css'
 
-interface CourseItem {
-    title: string;
-    count: number;
-}
-interface LineData {
-    name: string;
-    type: string;
-    data: number[]
+// interface CourseItem {
+//     title: string;
+//     count: number;
+// }
+//自己手写Echarts折线相关的结构
+// interface LineData {
+//     name: string;
+//     type: string;
+//     data: number[]
 
-}
+// }
+
+// interface DataStructure {
+//     [key: string]: CourseItem[]
+// }
+
 interface State {
     loaded: boolean,
     isLogin: boolean,
-    data: {
-        [key: string]: CourseItem[]
-    }
+    data: responseResult.DataStructure
 }
 
 class Home extends Component {
@@ -32,8 +36,9 @@ class Home extends Component {
     }
     componentDidMount() {
         //判断是否登录
-        axios.get("/api/isLogin").then((res) => {
-            if (!res.data.data) {//未登录
+        request.get("/api/isLogin").then((res) => {
+            const data: responseResult.isLogin = res.data
+            if (!data) {//未登录
                 this.setState({
                     isLogin: false,
                     loaded: true
@@ -45,18 +50,20 @@ class Home extends Component {
             }
         })
 
-        axios.get("/api/showData").then((res) => {
-            if (res.data.data) {
+        request.get("/api/showData").then((res) => {
+            const data: responseResult.DataStructure = res.data
+            if (data) {
                 this.setState({
-                    data: res.data.data
+                    data: data
                 })
             }
         })
     }
     //退出
     handleLogoutClick = () => {
-        axios.get("/api/logout").then((res) => {
-            if (res.data.data) {
+        request.get("/api/logout").then((res) => {
+            const data: responseResult.logout = res.data
+            if (data) {
                 this.setState({
                     isLogin: false,
                 })
@@ -67,8 +74,9 @@ class Home extends Component {
     }
     //爬取数据
     handleCrowllerClick = () => {
-        axios.get("/api/getData").then((res) => {
-            if (res.data.data) {
+        request.get("/api/getData").then((res) => {
+            const data: responseResult.getData = res.data
+            if (data) {
                 message.success('爬取成功')
             } else {
                 message.error('爬取失败')
@@ -83,7 +91,6 @@ class Home extends Component {
         const tempData: {
             [key: string]: number[]
         } = {}
-        console.log(data)
         for (let i in data) {
             const item = data[i]
             times.push(moment(Number(i)).format('MM-DD HH:mm'))  //时间
@@ -95,8 +102,8 @@ class Home extends Component {
                 tempData[title] ? tempData[title].push(count) : tempData[title] = [count]
             })
         }
-        console.log(tempData)
-        const result: LineData[] = []
+        // const result: LineData[] = []//echart折线手写的调用
+        const result: echarts.EChartOption.Series[] = []
         for (let i in tempData) {  //具体数据
             result.push({
                 name: i,

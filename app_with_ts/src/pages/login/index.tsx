@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import axios from 'axios'
+import request from '../../request'
 import qs from 'qs'
 import { Form, Input, Icon, Button, message } from 'antd';//强行使用antd3.0版本
 import { WrappedFormUtils } from 'antd/lib/form/Form'  //Stack Overflow或者自己找
@@ -26,7 +26,7 @@ class LoginForm extends Component<Props>{//通过泛型Props传递给组件
     this.props.form.validateFields((err, values) => { //values  =>  WrappedFormUtils <T>  => T= FormFields =>FormFields.password
       if (!err) {
         // console.log('Received values of form: ', values.password);
-        axios.post('./api/login', qs.stringify({
+        request.post('./api/login', qs.stringify({
           password: values.password
         }), {
             headers: {
@@ -35,7 +35,8 @@ class LoginForm extends Component<Props>{//通过泛型Props传递给组件
           }
         )
           .then((res) => {
-            if (res.data.data) {
+            const data:responseResult.login = res.data
+            if (data) {
               this.setState({
                 isLogin: true
               })
@@ -50,7 +51,7 @@ class LoginForm extends Component<Props>{//通过泛型Props传递给组件
   render() {
     const { isLogin } = this.state
     const { getFieldDecorator } = this.props.form;
-    return isLogin ? (<Redirect to="/"/>) : (
+    return isLogin ? (<Redirect to="/" />) : (
       <div className="login-page">
         <Form onSubmit={this.handleSubmit} className="login-form">
           <Form.Item>
