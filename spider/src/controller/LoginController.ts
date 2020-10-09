@@ -9,14 +9,14 @@ interface BodyRequest extends Request {
 }
 
 // 先走get装饰器,再走controller装饰器
-@controller('/')   //prefix
+@controller('/api')   //prefix
 export class LoginController {
     //登录判断
     static isLogin(req: BodyRequest): boolean {
         return !!(req.session ? req.session.login : false)
     }
 
-    @get('/api/isLogin')  //适配前端的跨域代理接口
+    @get('/isLogin')  //适配前端的跨域代理接口
     isLogin(req: BodyRequest, res: Response): void {
         const isLogin = LoginController.isLogin(req)
         res.json(getResponseData(isLogin))
@@ -27,7 +27,7 @@ export class LoginController {
         const { password } = req.body
         const isLogin = LoginController.isLogin(req)
         if (isLogin) {
-            res.json(getResponseData(false, '已经登录过'))
+            res.json(getResponseData(true))
         } else {
             if (password == '123' && req.session) {
                 req.session.login = true

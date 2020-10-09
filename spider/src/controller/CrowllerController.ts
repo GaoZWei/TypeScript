@@ -13,7 +13,7 @@ interface BodyRequest extends Request {
 }
 
 const checkLogin = (req: Request, res: Response, next: NextFunction): void => {
-    console.log('checkLogin middleware');
+    // console.log('checkLogin middleware');
     const isLogin = !!(req.session ? req.session.login : false)  //!!转成bool类型
     if (isLogin) {
         next()
@@ -22,6 +22,7 @@ const checkLogin = (req: Request, res: Response, next: NextFunction): void => {
     }
 }
 
+//测试小功能(可忽略)
 const test = (req: Request, res: Response, next: NextFunction): void => {
    console.log('test middleware');
    next()
