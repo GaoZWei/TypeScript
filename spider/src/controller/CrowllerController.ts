@@ -28,7 +28,7 @@ const test = (req: Request, res: Response, next: NextFunction): void => {
    next()
 }
 
-@controller('/')
+@controller('/api')
 export class CrowllerController {
 
     @get('/getData')

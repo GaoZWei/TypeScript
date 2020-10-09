@@ -1,15 +1,37 @@
 import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { Button, message } from 'antd'
+import ReactEcharts from 'echarts-for-react';
 import axios from 'axios'
+import moment from 'moment'
 import './style.css'
 
+interface CourseItem {
+    title: string;
+    count: number;
+}
+interface LineData {
+    name: string;
+    type: string;
+    data: number[]
+
+}
+interface State {
+    loaded: boolean,
+    isLogin: boolean,
+    data: {
+        [key: string]: CourseItem[]
+    }
+}
+
 class Home extends Component {
-    state = {
+    state: State = {
         loaded: false,
-        isLogin: true
+        isLogin: true,
+        data: {}
     }
     componentDidMount() {
+        //判断是否登录
         axios.get("/api/isLogin").then((res) => {
             if (!res.data.data) {//未登录
                 this.setState({
@@ -22,7 +44,16 @@ class Home extends Component {
                 })
             }
         })
+
+        axios.get("/api/showData").then((res) => {
+            if (res.data.data) {
+                this.setState({
+                    data: res.data.data
+                })
+            }
+        })
     }
+    //退出
     handleLogoutClick = () => {
         axios.get("/api/logout").then((res) => {
             if (res.data.data) {
@@ -34,15 +65,85 @@ class Home extends Component {
             }
         })
     }
+    //爬取数据
+    handleCrowllerClick = () => {
+        axios.get("/api/getData").then((res) => {
+            if (res.data.data) {
+                message.success('爬取成功')
+            } else {
+                message.error('爬取失败')
+            }
+        })
+    }
+    //Echarts
+    getOption: () => echarts.EChartOption = () => {
+        const { data } = this.state
+        const courseNames: string[] = []
+        const times: string[] = []
+        const tempData: {
+            [key: string]: number[]
+        } = {}
+        console.log(data)
+        for (let i in data) {
+            const item = data[i]
+            times.push(moment(Number(i)).format('MM-DD HH:mm'))  //时间
+            item.forEach(innerItem => {
+                const { title, count } = innerItem
+                if (courseNames.indexOf(title) === -1) {
+                    courseNames.push(title) //课程名
+                }
+                tempData[title] ? tempData[title].push(count) : tempData[title] = [count]
+            })
+        }
+        console.log(tempData)
+        const result: LineData[] = []
+        for (let i in tempData) {  //具体数据
+            result.push({
+                name: i,
+                type: 'line',
+                data: tempData[i]
+            })
+        }
+        return {
+            title: {
+                text: '课程在线学习人数'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: courseNames
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: times
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: result
+        };
+
+    }
     render() {
         const { isLogin, loaded } = this.state
         if (isLogin) {
             if (loaded) {
                 return (
                     <div className="home-page">
-                        <Button type="primary" style={{ marginLeft: "20px" }}>爬取</Button>
-                        <Button type="primary">展示</Button>
-                        <Button type="primary" onClick={this.handleLogoutClick}>退出</Button>
+                        <div className="buttons">
+                            <Button type="primary" style={{ marginRight: "25px" }} onClick={this.handleCrowllerClick}>爬取</Button>
+                            {/* <Button type="primary">展示</Button> */}
+                            <Button type="primary" onClick={this.handleLogoutClick}>退出</Button>
+                        </div>
+                        <ReactEcharts option={this.getOption()} />
                     </div>)
             }
             return null
